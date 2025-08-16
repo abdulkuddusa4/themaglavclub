@@ -1,0 +1,8 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+pillow
+python-dotenv
+django-unfold
+drf-spectacular[sidecar]
+django-cors-headers
