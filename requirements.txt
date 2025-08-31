@@ -6,3 +6,5 @@ python-dotenv
 django-unfold
 drf-spectacular[sidecar]
 django-cors-headers
+openpyxl
+pandas

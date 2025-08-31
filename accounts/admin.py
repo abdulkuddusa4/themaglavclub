@@ -1,5 +1,10 @@
-from unfold import admin as unfold_admin
 from django.contrib import admin, messages
+from django.urls import reverse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.shortcuts import redirect
+
+from unfold import admin as unfold_admin
 from .models import JTUser
 
 
@@ -33,7 +38,11 @@ class JTUserAdmin(unfold_admin.ModelAdmin):
             request,
             "Agents  At your company."
         )
+        print("CALLED ...")
         return qs
+
+    def get_object(self, request, object_id, *args):
+        return JTUser.objects.filter(id=object_id).first()
 
     def get_readonly_fields(self, request, obj=None):
         return [
@@ -53,4 +62,13 @@ class JTUserAdmin(unfold_admin.ModelAdmin):
     #             "Agents With their email verified are shown here."
     #         )
     #     return super().changelist_view(request, extra_context)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        user = self.get_object(request, object_id)
+        # if user:
+        #     extra_context = extra_context or {}
+        #     extra_context['password_change_url'] = reverse(
+        #         'admin:auth_user_password_change', args=(user.pk,)
+        #     )
+        return super().change_view(request, object_id, form_url, extra_context)
     pass

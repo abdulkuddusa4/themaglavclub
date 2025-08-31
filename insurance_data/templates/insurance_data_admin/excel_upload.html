@@ -1,0 +1,15 @@
+{% extends "unfold/layouts/base.html" %}
+
+{% block content %}
+  <div class="unfold-card p-6 max-w-xl mx-auto">
+    <h1 class="text-xl font-bold mb-4">Upload Excel File</h1>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="unfold-btn unfold-btn-primary">
+        <i class="unfold-icon upload"></i> Upload
+      </button>
+    </form>
+  </div>
+{% endblock %}

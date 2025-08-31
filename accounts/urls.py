@@ -21,3 +21,4 @@ urlpatterns = [
     path('change_password', change_password),
     path('reset_password/', reset_password),
 ]
+

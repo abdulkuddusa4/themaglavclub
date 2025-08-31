@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     # 'vectordb',
 
     'accounts',
+    'insurance_data',
     'drf_spectacular',
 
 ]
@@ -234,6 +235,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static_root'
+STATICFILES_DIRS = [
+    BASE_DIR/'static_files'
+]
+
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -250,9 +255,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 UNFOLD = {
-    "SITE_TITLE": "Custom suffix in <title> tag",
+    "SITE_TITLE": "JTGroup Admin",
     "SITE_HEADER": "JT Agency",
-    # "SITE_SUBHEADER": "Appears under SITE_HEADER",
+    "SITE_SUBHEADER": "Appears under SITE_HEADER",
     # "SITE_DROPDOWN": [
     #     {
     #         "icon": "diamond",
@@ -262,7 +267,7 @@ UNFOLD = {
     #     # ...
     # ],
     # "SITE_URL": "/",
-    # # "SITE_ICON": lambda request: static("icon.svg"),  # both modes, optimise for 32px height
+    "SITE_ICON": lambda request: static("logo.svg"),  # both modes, optimise for 32px height
     # "SITE_ICON": {
     #     "light": lambda request: static("icon-light.svg"),  # light mode
     #     "dark": lambda request: static("icon-dark.svg"),  # dark mode
@@ -287,7 +292,7 @@ UNFOLD = {
     # "ENVIRONMENT": "sample_app.environment_callback", # environment name in header
     # "ENVIRONMENT_TITLE_PREFIX": "sample_app.environment_title_prefix_callback", # environment name prefix in title tag
     # "DASHBOARD_CALLBACK": "sample_app.dashboard_callback",
-    # "THEME": "dark", # Force theme: "dark" or "light". Will disable theme switcher
+    "THEME": "light", # Force theme: "dark" or "light". Will disable theme switcher
     # "LOGIN": {
     #     "image": lambda request: static("sample/login-bg.jpg"),
     #     "redirect_after": lambda request: reverse_lazy("admin:APP_MODEL_changelist"),
@@ -387,30 +392,30 @@ UNFOLD = {
 }
 
 
-def dashboard_callback(request, context):
-    """
-    Callback to prepare custom variables for index template which is used as dashboard
-    template. It can be overridden in application by creating custom admin/index.html.
-    """
-    context.update(
-        {
-            "sample": "example",  # this will be injected into templates/admin/index.html
-        }
-    )
-    return context
+# def dashboard_callback(request, context):
+#     """
+#     Callback to prepare custom variables for index template which is used as dashboard
+#     template. It can be overridden in application by creating custom admin/index.html.
+#     """
+#     context.update(
+#         {
+#             "sample": "example",  # this will be injected into templates/admin/index.html
+#         }
+#     )
+#     return context
 
 
-def environment_callback(request):
-    """
-    Callback has to return a list of two values represeting text value and the color
-    type of the label displayed in top right corner.
-    """
-    return ["Production", "danger"] # info, danger, warning, success
+# def environment_callback(request):
+#     """
+#     Callback has to return a list of two values represeting text value and the color
+#     type of the label displayed in top right corner.
+#     """
+#     return ["Production", "danger"] # info, danger, warning, success
 
 
-def badge_callback(request):
-    return 3
+# def badge_callback(request):
+#     return 3
 
 
-def permission_callback(request):
-    return request.user.has_perm("sample_app.change_model")
+# def permission_callback(request):
+#     return request.user.has_perm("sample_app.change_model")
