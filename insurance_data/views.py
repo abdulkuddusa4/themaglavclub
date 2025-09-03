@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from rest_framework.decorators import api_view
 
 
-def upload_agent_case_count()
+@api_view(['GET'])
+def leaderboard_view(request):
+	pass

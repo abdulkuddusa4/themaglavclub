@@ -28,6 +28,7 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('accounts.urls')),
+    path('insurance_data/', include('insurance_data.urls')),
     path('favicon.ico', favicon_view),
 ]
 

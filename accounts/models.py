@@ -63,6 +63,7 @@ class JTUser(AbstractUser):
     otp = models.CharField(default=create_otp, max_length=10)
 
     email_verified = models.BooleanField(default=False)
+    agent_code = models.CharField(max_length=5, null=True, unique=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

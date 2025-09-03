@@ -8,10 +8,9 @@ import os
 
 
 class TopQuartileStatus(models.TextChoices):
-    """Observed statuses; extend as needed."""
     TERMINATED = "TERMINATED", "TERMINATED"
-    YES = "YES", "YES"
-    NO = "NO", "NO"
+    IN = "IN", "IN"
+    OUT = "OUT", "OUT"
     NA = "N/A", "N/A"
 
 
@@ -20,7 +19,7 @@ class CaseCount(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="case_performance",
-        limit_choices_to={"agent_code__isnull": False},  # ensures agent_code is set
+        limit_choices_to={"agent_code__isnull": False},
     )
 
     year = models.PositiveSmallIntegerField(db_index=True)
@@ -30,6 +29,7 @@ class CaseCount(models.Model):
         choices=TopQuartileStatus.choices,
         default=TopQuartileStatus.NA,
     )
+
     TOP_QUARTILE_YTD = models.CharField(
         max_length=20,
         choices=TopQuartileStatus.choices,
@@ -78,7 +78,6 @@ class CaseCount(models.Model):
 
     @property
     def sum_of_months(self) -> Decimal:
-        """Sum JAN..DEC (useful cross-check against YTD_CASE)."""
         return sum([
             self.JAN, self.FEB, self.MAR, self.APR, self.MAY, self.JUN,
             self.JUL, self.AUG, self.SEP, self.OCT, self.NOV, self.DEC
@@ -86,7 +85,6 @@ class CaseCount(models.Model):
 
     @staticmethod
     def parse_percent_to_fraction(value) -> Decimal:
-        """Convert '12%' or '-100%' into a fraction (0.12, -1.0)."""
         if value is None:
             return Decimal("0")
         if isinstance(value, Decimal):
@@ -115,9 +113,105 @@ def upload_to_path(instance, filename):
     return f'uploads/{instance.month_year.year}/{instance.month_year.month:02d}/{filename}'
 
 
-from django.db import models
-from django.core.validators import FileExtensionValidator
-import os
+class FYC(models.Model):
+    agent = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="fyc_performance",
+        limit_choices_to={"agent_code__isnull": False},
+    )
+
+    year = models.PositiveSmallIntegerField(db_index=True)
+
+    TOP_QUARTILE_MTD = models.CharField(
+        max_length=20,
+        choices=TopQuartileStatus.choices,
+        default=TopQuartileStatus.NA,
+    )
+
+    TOP_QUARTILE_YTD = models.CharField(
+        max_length=20,
+        choices=TopQuartileStatus.choices,
+        default=TopQuartileStatus.NA,
+    )
+
+    JAN = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    FEB = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    MAR = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    APR = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    MAY = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    JUN = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    JUL = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    AUG = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    SEP = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    OCT = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    NOV = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    DEC = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+
+    YTD_GROWTH = models.DecimalField(
+        max_digits=7,
+        decimal_places=4,
+        default=Decimal("0.0000"),
+        validators=[MinValueValidator(Decimal("-1.0")), MaxValueValidator(Decimal("1.0"))],
+    )
+    YTD_CONTRIBUTION_TO_UNIT = models.DecimalField(
+        max_digits=7,
+        decimal_places=4,
+        default=Decimal("0.0000"),
+        validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("1.0"))],
+    )
+
+    class Meta:
+        db_table = "agent_case_performance"
+        unique_together = ("agent", "year")
+        indexes = [
+            models.Index(fields=["year", "agent"]),
+            models.Index(fields=["TOP_QUARTILE_MTD"]),
+            models.Index(fields=["TOP_QUARTILE_YTD"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.agent} ({self.year})"
+
+    @property
+    def sum_of_months(self) -> Decimal:
+        return sum([
+            self.JAN, self.FEB, self.MAR, self.APR, self.MAY, self.JUN,
+            self.JUL, self.AUG, self.SEP, self.OCT, self.NOV, self.DEC
+        ], Decimal("0.00"))
+
+    @staticmethod
+    def parse_percent_to_fraction(value) -> Decimal:
+        if value is None:
+            return Decimal("0")
+        if isinstance(value, Decimal):
+            return value
+        s = str(value).strip().replace("%%", "%")
+        if s.endswith("%"):
+            s = s[:-1].strip()
+            return (Decimal(s) / Decimal("100")).quantize(Decimal("0.0001"))
+        return Decimal(s)
+
+    class Meta:
+        verbose_name = "FYC"
+        verbose_name_plural = "FYC..."
+
+
+class FYCImport(models.Model):
+    year = models.IntegerField()
+    excel_file = models.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=['xlsx', 'xls'])],
+        help_text="Upload Excel file with ANP data"
+    )
+
+
+def upload_to_path(instance, filename):
+    """Custom upload path for files"""
+    return f'uploads/{instance.month_year.year}/{instance.month_year.month:02d}/{filename}'
+
+
+
+
 
 
 class ANP(models.Model):

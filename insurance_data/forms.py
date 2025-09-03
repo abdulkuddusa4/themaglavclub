@@ -262,3 +262,75 @@ class CaseCountImportForm(forms.ModelForm):
                 raise ValidationError(f'Error processing Excel file: {str(e)}')
 
         return file
+
+
+class FYCImportForm(forms.ModelForm):
+    class Meta:
+        # model = CaseCountImport
+        model = CaseCountImport
+        fields = '__all__'
+        widgets = {
+            'excel_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': '.xlsx,.xls',
+                'style': '''
+                    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                    color: white !important;
+                    border: none !important;
+                    padding: 12px 20px !important;
+                    border-radius: 8px !important;
+                    font-weight: 600 !important;
+                    cursor: pointer !important;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+                '''
+            }),
+            'year': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1111,
+                'max': 9999,
+                'value': datetime.now().year
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['year'].initial = datetime.now().year
+
+    def clean(self):
+        pass
+
+
+class FYCImportForm(forms.ModelForm):
+    class Meta:
+        # model = CaseCountImport
+        model = CaseCountImport
+        fields = '__all__'
+        widgets = {
+            'excel_file': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': '.xlsx,.xls',
+                'style': '''
+                    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                    color: white !important;
+                    border: none !important;
+                    padding: 12px 20px !important;
+                    border-radius: 8px !important;
+                    font-weight: 600 !important;
+                    cursor: pointer !important;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+                '''
+            }),
+            'year': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1111,
+                'max': 9999,
+                'value': datetime.now().year
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['year'].initial = datetime.now().year
+
+    def clean(self):
+        pass
